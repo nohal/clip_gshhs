@@ -19,3 +19,7 @@ Unzip the GSHHG data (native binary from http://www.soest.hawaii.edu/pwessel/gsh
 If you can afford a 5GB ramdisk, you will save A LOT of time as hundreds of thousands of files are created and used in the bd subfolder
 
 mount -t tmpfs -o size=5G tmpfs bd
+
+TODO
+----
+Update the tools to work with the current GSHHG 2.3
