@@ -58,11 +58,12 @@ else :
 
 def clip_gshhs(path_init, x0, y0, x1, y1, pas_fin, resol, level) :
     poly_init_file = path_init + resol + level + '.dat'
-    print poly_init_file
+    #print poly_init_file
     poly_init = Polygon(poly_init_file)
 
     x = x0
     while x < x1  :
+	print x
         y = y0
         while y < y1 :
             xc = x * 1000000
@@ -75,7 +76,7 @@ def clip_gshhs(path_init, x0, y0, x1, y1, pas_fin, resol, level) :
                 os.mkdir(path_fin)
 
             poly_finish_file = path_fin + resol + level + '.dat'
-            print poly_finish_file
+            #print poly_finish_file
 
             poly_clip = Polygon(((xc, yc), (xc + pas1c, yc), (xc + pas1c, yc +pas1c), (xc, yc +pas1c)))
             poly_finish = poly_init & poly_clip
@@ -103,6 +104,7 @@ def clip_gshhs(path_init, x0, y0, x1, y1, pas_fin, resol, level) :
 pas = 45
 x=0
 while x<360 :
+    print x
     y=-90
     while y<90 :
         path_poly_dir = path_BD + 'bd_' + resol + '/' + str(x) + '_' + str(y) + '_to_' + str(x + pas) + '_' + str(y + pas) + '/'

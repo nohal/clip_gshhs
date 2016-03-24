@@ -106,7 +106,7 @@ int main (int argc, char **argv)
             fprintf (stderr, "Impossible d'ouvrir le fichier %s\n", bd_end[i].file);
             exit (EXIT_FAILURE);
         }
-        header_end[i].version=  220;
+        header_end[i].version=  234;
         header_end[i].pasx=     pas[i];
         header_end[i].pasy=     pas[i];
         header_end[i].xmin=     0;
@@ -130,18 +130,19 @@ int main (int argc, char **argv)
         }
         for (x=0; x<360; x=x+pas[i])
         {
+		printf("X=%d\n",x);
             for (y=-90; y<90; y=y+pas[i])
             {
                 if (get_gpc_path(gpc_path, bd_path, x, y, pas, i) != 0)
                 {
                     fseek(file_end[i].file, 0L, SEEK_END);
                     pos_data = ftell(file_end[i].file);
-                    printf("pos_data: %d\n", pos_data);
+                    //printf("pos_data: %d\n", pos_data);
 
                     for (c=1; c<=5; c=c+1)
                     {
                         sprintf(gpc_file, "%s/%s%d.dat", gpc_path, argv[1], c);
-                        printf("X: %i, Y: %i, File: %s\n", x, y, gpc_file);
+                        //printf("X: %i, Y: %i, File: %s\n", x, y, gpc_file);
 
                         if ((polygon_file = fopen(gpc_file, "r")) == NULL )
                         {
@@ -151,7 +152,7 @@ int main (int argc, char **argv)
 
                         gpc_read_polygon(polygon_file, 1, &polygon);      /* Lecture du fichier polygone*/
 
-                        printf("num_contour: %d\n", polygon.num_contours);
+                        //printf("num_contour: %d\n", polygon.num_contours);
 
                         fwrite(&polygon.num_contours, sizeof(int), 1, file_end[i].file);
                         for (n_contour=0; n_contour<polygon.num_contours; n_contour++)
@@ -171,7 +172,7 @@ int main (int argc, char **argv)
                         gpc_free_polygon(&polygon);
                     }
                     tab_data = (x/pas[i])*(180/pas[i]) + (y+90)/pas[i];
-                    printf("tab_data: %d\n\n", tab_data);
+                    //printf("tab_data: %d\n\n", tab_data);
                     fseek(file_end[i].file, sizeof(header_end[i]) + tab_data*sizeof(int), SEEK_SET); //erreur + tab_data*sizeof(long)
                     fwrite(&pos_data, sizeof(int), 1, file_end[i].file);
 

@@ -72,6 +72,7 @@ while i <= 5 :
     pas1 = 45
 
     while x < 360 :
+	print x
         y = -90
         while y < 90 :
             xc = x * 1000000
@@ -87,7 +88,7 @@ while i <= 5 :
                 os.mkdir(path_poly_dir)
 
             path_poly_finish = path_poly_dir+ '/' + level + str(i) + '.dat'
-            print path_poly_finish
+            #print path_poly_finish
 
             poly_clip = Polygon(((xc, yc), (xc + pas1c, yc), (xc + pas1c, yc +pas1c), (xc, yc +pas1c)))
             poly_finish = poly_start & poly_clip
@@ -114,6 +115,7 @@ poly_clip=0
 print "Passe 2"
 i = 1
 while i <= 5 :
+    print i
     y=-90
     while y<90 :
         path_poly_o = path_BD_f + str(y) + '_to_' + str(y + pas1) + '/' + level + str(i) + '.dat'
@@ -176,6 +178,7 @@ i=5
 x=0
 while x<360 :
     y=-90
+    print x
     while y<90 :
         path_poly_dir = path_BD_f + str(x) + '_' + str(y) + '_to_' + str(x + pas1) + '_' + str(y + pas1)
         path_poly_1 = path_poly_dir +'/' + level + str(i) + '.dat'
@@ -184,7 +187,7 @@ while x<360 :
         path_poly_f_dir = path_BD_f +'/'+ str(x) + '_' + str(y) + '_to_' + str(x + pas1) + '_' + str(y + pas1)
 
         path_poly_f = path_poly_f_dir+ '/' + level + str(i) + '.dat'
-        print path_poly_f
+        #print path_poly_f
         poly_start_1.write(path_poly_f)
 
         y=y+pas1

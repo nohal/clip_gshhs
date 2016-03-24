@@ -34,7 +34,7 @@
 RESOL=$1
 
 #PATHBD=/home/spenot/gshhs
-PATHBD=./
+PATHBD=./gshhs
 
 echo Nettoyage
     cd bd

@@ -32,7 +32,7 @@
 
 
 #PATHBD=/home/spenot/gshhs
-PATHBD=./
+PATHBD=./gshhs
 
 for RESOL in c l i h f; do
     echo Nettoyage

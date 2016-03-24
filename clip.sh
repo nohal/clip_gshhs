@@ -34,8 +34,7 @@
 RESOL=$1
 
 #PATHBD=/home/spenot/gshhs
-PATHBD=./
-
+PATHBD=./gshhs
 
     echo Resolution $RESOL
     echo Extraction de GSHHS

@@ -38,11 +38,11 @@ ETOPO_DAT=$2
 # wget http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/xyz/ETOPO1_Ice_g_int.xyz.gz
 # wget http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/xyz/ETOPO1_Bed_g_int.xyz.gz
 
-echo Decompression
-gunzip $ETOPO.gz
+#echo Decompression
+#gunzip $ETOPO.gz
 
 echo Passe 1
-./compile_etopo $ETOPO $ETOPO.dat
+./compile_etopo $ETOPO
 
 echo Passe finale
 ./compile_etopo_060 $ETOPO.dat $ETOPO_DAT.dat

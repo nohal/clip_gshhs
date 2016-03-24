@@ -54,7 +54,7 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons, int debug)
     int     k, max_east = 270000000, n_read;
     int     lastx, lasty, fakey;
     int     pos = 1;
-    int     version;
+    //int     version;
     int     i = 0;
     /*Polygone *tableau;*/
     gshhs_vertex_list *temp_polygons;
@@ -63,10 +63,13 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons, int debug)
     struct GSHHS h;
 
     n_read = fread ((void *)&h, (size_t)sizeof (struct GSHHS), (size_t)1, gshhs_file);
-    version = (h.flag >> 8) & 255;
+    //version = (h.flag >> 8) & 255;
 
     while (n_read == 1)
     {
+	    
+	    fprintf(stderr,"id=%x - n=%x\n",h.id,h.n);
+	    
         h.id = ntohl(h.id);
         h.n  = ntohl(h.n);
         h.west  = ntohl(h.west);
@@ -75,12 +78,15 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons, int debug)
         h.north = ntohl(h.north);
         h.area  = ntohl(h.area);
         h.flag  = ntohl(h.flag);
+	
+	fprintf(stderr,"conv => id=%x - n=%x\n",h.id,h.n);
 
         if (h.id == 0)
         {
             polygons->contour = NULL;
             i = 1024;
             polygons->contour = malloc(i * sizeof(gshhs_vertex_list));
+	    fprintf(stderr,"Create array \n");
             if ( polygons->contour == NULL )
             {
                 fprintf(stderr,"Allocation impossible \n");
@@ -93,6 +99,7 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons, int debug)
             i = i + 1024;
             temp_polygons = NULL;
             temp_polygons = realloc(polygons->contour, i * sizeof(gshhs_vertex_list));
+	    fprintf(stderr,"Extend array \n");
             if (temp_polygons == NULL)
             {
                 fprintf(stderr,"Reellocation impossible \n");
@@ -105,10 +112,14 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons, int debug)
             }
         }
 
+        fprintf(stderr,"id=%d \n",h.id);
+        
         polygons->contour[h.id].id = h.id;
         if (h.south == -90000000) {
+	  fprintf(stderr,"Adding points \n");
 	  // we will add 4 points
 	  h.n = h.n + 4;
+	  pos=1;
         }
 
         polygons->contour[h.id].nb_point    = h.n;

@@ -30,7 +30,7 @@
 
 
 CC = gcc
-CFLAGS = -Wall -O3 -std=gnu99
+CFLAGS = -Wall -O3 -std=gnu99 -g
 LDFLAGS = -lm -lgd -lpng
 
 EXEC=readgshhs read_bd map_g tiles_g readcontour map2gml readlines compile_etopo compile_etopo_060

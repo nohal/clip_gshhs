@@ -83,7 +83,21 @@ int main (int argc, char **argv)
 
 
     fseek(EtopoCompFile, 0 , SEEK_SET);
-
+    
+    /*
+     NCOLS         21601
+     N ROWS         1080*1
+     XLLCENTER     -180.000000
+     YLLCENTER     -90.000000
+     CELLSIZE      0.01666666667
+     NODATA_VALUE  -32768
+     BYTEORDER     LSBFIRST
+     NUMBERTYPE    2_BYTE_INTEGER
+     ZUNITS        METERS
+     MIN_VALUE     -10898
+     MAX_VALUE     8271
+     */
+    
     Header.NCOLS    =21601;
     Header.NROWS    =10801;
     Header.START_X  =-180.0;

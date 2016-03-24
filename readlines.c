@@ -330,7 +330,7 @@ int main (int argc, char **argv)
         fprintf (stderr, "Impossible d'ouvrir le fichier %s\n", path_out_file);
         exit (EXIT_FAILURE);
     }
-    header_out.version=  220;
+    header_out.version=  234;
     header_out.pasx=     1;
     header_out.pasy=     1;
     header_out.xmin=     0;
