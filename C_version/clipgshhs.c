@@ -35,7 +35,7 @@
 #include <math.h>
 
 
-#include "gshhs.h"
+#include "gshhg.h"
 #include "gpc.h"
 #include "PolyUtil.h"
 
@@ -57,22 +57,22 @@ int main (int argc, char **argv)
 {
     FILE *GshhsFile=NULL;
     char GshhsFileName[1024];
-    
+
     FILE *PolyDataFile=NULL;
     char PolyDataFileName[1024];
-    
+
     gshhs_polygons *polygons;
-    
+
     gpc_polygon GpcPolygon;
     gpc_polygon clip;
     gpc_polygon result;
-    
+
     //PolyData Poly90;
     PolyData Poly45;
     PolyData Poly15;
     PolyData Poly05;
     PolyData Poly01;
-    
+
     int x,y;
     int id;
     int i;
@@ -80,7 +80,7 @@ int main (int argc, char **argv)
     int level;
     int n_contour;
     int n_point;
-    
+
     PolygonFileHeader PolyDataFileHeader;
 
     /* gestion de la ligne de commande */
@@ -90,9 +90,9 @@ int main (int argc, char **argv)
         fprintf (stderr, USAGE);
         exit (EXIT_FAILURE);
     }
-    
+
     printf (CLIPGSHHS);
-    
+
     /* Ouverture du fichier GSHHS */
     sprintf(GshhsFileName, "%s", argv[1]);
     if ((GshhsFile = fopen (GshhsFileName, "rb")) == NULL ) {
@@ -118,63 +118,70 @@ int main (int argc, char **argv)
 
     /* fermeture du fichier GSHHS */
     fclose (GshhsFile);
-    
+
     //PolyDataCreate(&Poly90, 90);
     PolyDataCreate(&Poly45, 45);
     PolyDataCreate(&Poly15, 15);
     PolyDataCreate(&Poly05, 5);
     PolyDataCreate(&Poly01, 1);
-    
+
     printf("GSHHS > Poly45\n");
-    
+
     for(id=0; id<polygons->nb_poly; id++)
     {
         GshhsToGpc(polygons, &GpcPolygon, id);
         //printf("Id: %d\n", id);
         //printf("num_vertices: %d\n", GpcPolygon.contour[0].num_vertices);
         //printf("Level: %d\n", polygons->contour[id].level);
-        
+
         // On recupere ce qui est inferieur à 0 de longitude
-        CreateClip(&clip, -180 / GSHHS_SCL, -90 / GSHHS_SCL, 0 / GSHHS_SCL, 90 / GSHHS_SCL);
+        CreateClip(&clip, -180 / GSHHG_SCL, -90 / GSHHG_SCL, 0 / GSHHG_SCL, 90 / GSHHG_SCL);
         gpc_polygon_clip(GPC_INT, &GpcPolygon, &clip, &result);
-        poly_p_shift(&result, 360 / GSHHS_SCL, 0);   // Translation de 360° pour le remettre dans le domaine [0..360°]
+        poly_p_shift(&result, 360 / GSHHG_SCL, 0);   // Translation de 360° pour le remettre dans le domaine [0..360°]
         for(i=0; i<result.num_contours; i++)
         {
+            if(polygons->contour[id].level == 6) //Skip Antarctic ice boundary
+                continue;
+            if(polygons->contour[id].level == 5) //Treat Antartic grounding line as coastline
+                polygons->contour[id].level = 1;
             gpc_add_contour(&GpcPolygon, &result.contour[i], 0); // On réecrit les données à leur place
         }
-        
+
         gpc_free_polygon(&clip);
         gpc_free_polygon(&result);
-        
+
 
         // Découpage en carré de 45° et mise en mémoire dans Poly45
         for (x=0; x<(360/Poly45.step); x++)
         {
             for (y=0; y<(180/Poly45.step); y++)
             {
-                CreateClip(&clip, (x*Poly45.step) / GSHHS_SCL, (-90+y*Poly45.step) / GSHHS_SCL,
-                                    ((x+1)*Poly45.step) / GSHHS_SCL, (-90+(y+1)*Poly45.step) / GSHHS_SCL);
+                CreateClip(&clip, (x*Poly45.step) / GSHHG_SCL, (-90+y*Poly45.step) / GSHHG_SCL,
+                                    ((x+1)*Poly45.step) / GSHHG_SCL, (-90+(y+1)*Poly45.step) / GSHHG_SCL);
                 gpc_polygon_clip(GPC_INT, &GpcPolygon, &clip, &result);
-                
-                //printf("result1.num_contours: %d\n", result1.num_contours);
+
                 for(i=0; i<result.num_contours; i++)
                 {
+                    if(polygons->contour[id].level == 6) //Skip Antarctic ice boundary
+                        continue;
+                    if(polygons->contour[id].level == 5) //Treat Antartic grounding line as coastline
+                        polygons->contour[id].level = 1;
                     gpc_add_contour(Poly45.poly[polygons->contour[id].level-1][x][y], &result.contour[i], 0);
                 }
-                
+
                 gpc_free_polygon(&clip);
                 gpc_free_polygon(&result);
             }
         }
         gpc_free_polygon(&GpcPolygon);
     }
-    
+
     /* vidage de la memoire des données GSHHS */
     free_gshhs(polygons, polygons->nb_poly);
 
     free(polygons);
     polygons = NULL;
-    
+
     //Clipping des polygones
     //printf("Poly90 > Poly45\n");
     //ReClipping(&Poly90, &Poly45);
@@ -196,8 +203,8 @@ int main (int argc, char **argv)
     }
 
     pos_data = 0;
-    
-    PolyDataFileHeader.version=  300;
+
+    PolyDataFileHeader.version=  220;
     PolyDataFileHeader.pasx=     1;
     PolyDataFileHeader.pasy=     1;
     PolyDataFileHeader.xmin=     0;
@@ -232,7 +239,7 @@ int main (int argc, char **argv)
             {
                 //printf("Poly01.poly[level][x][y]->num_contours: %d\n", Poly01.poly[level][x][y]->num_contours);
                 fwrite(&Poly01.poly[level][x][y]->num_contours, sizeof(int), 1, PolyDataFile);
-            
+
                 for (n_contour=0; n_contour<Poly01.poly[level][x][y]->num_contours; n_contour++)
                 {
                     fwrite(&Poly01.poly[level][x][y]->hole[n_contour], sizeof(int), 1, PolyDataFile);
@@ -250,9 +257,9 @@ int main (int argc, char **argv)
             fwrite(&pos_data, sizeof(int), 1, PolyDataFile);
         }
     }
-            
+
     fclose(PolyDataFile);
-    
+
     //PolyDataDelete(&Poly90);
     PolyDataDelete(&Poly45);
     PolyDataDelete(&Poly15);
@@ -260,6 +267,6 @@ int main (int argc, char **argv)
     PolyDataDelete(&Poly01);
 
     printf("The End!\n");
-    
+
     exit (EXIT_SUCCESS);
 }

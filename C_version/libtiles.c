@@ -40,16 +40,16 @@
 #include <gdfontl.h>    /*Police gdFontLarge */
 #include <gdfontg.h>    /*Police gdFontGiant */
 
-#include "gshhs.h"
+#include "gshhg.h"
 #include "gpc.h"
 #include "PolyUtil.h"
 
 #include "libtiles.h"
 
-                            
-                            
-                            
-                            
+
+
+
+
 void GshhsToGpcFile(FILE *gpc_file, gshhs_polygons *polygons, int id_poly)
 {
     int i;
@@ -64,9 +64,9 @@ void GshhsToGpc(gshhs_polygons *GshhsPolygon, gpc_polygon *GpcPolygon, int Gshhs
 
     int num_vertices;
     int v;
-    
+
     num_vertices = GshhsPolygon->contour[GshhsIdPoly].nb_point - 1;
-    
+
     MALLOC(GpcPolygon->hole, 1 * sizeof(int), "hole flag array creation", int);
     MALLOC(GpcPolygon->contour, 1 * sizeof(gpc_vertex_list), "contour creation", gpc_vertex_list);
     MALLOC(GpcPolygon->contour[0].vertex, num_vertices * sizeof(gpc_vertex), "vertex creation", gpc_vertex);
@@ -74,7 +74,7 @@ void GshhsToGpc(gshhs_polygons *GshhsPolygon, gpc_polygon *GpcPolygon, int Gshhs
     GpcPolygon->num_contours = 1;
     GpcPolygon->hole[0] = 0;
     GpcPolygon->contour[0].num_vertices = num_vertices;
-    
+
     for (v= 0; v < num_vertices; v++)
     {
         GpcPolygon->contour[0].vertex[v].x = GshhsPolygon->contour[GshhsIdPoly].vertex[v].x;
@@ -92,10 +92,10 @@ void CreateClip(gpc_polygon *GpcPolygon, double xmin, double ymin, double xmax, 
     GpcPolygon->num_contours = 1;
     GpcPolygon->hole[0] = 0;
     GpcPolygon->contour[0].num_vertices = 4;
-    
+
     GpcPolygon->contour[0].vertex[0].x = xmin;
     GpcPolygon->contour[0].vertex[0].y = ymin;
-    
+
     GpcPolygon->contour[0].vertex[1].x = xmax;
     GpcPolygon->contour[0].vertex[1].y = ymin;
 
@@ -110,12 +110,12 @@ void CreateClip(gpc_polygon *GpcPolygon, double xmin, double ymin, double xmax, 
 void PolyDataCreate(PolyData *Data, int step)
 {
     int i, j, k;
-    
+
     if (step<1)     step=1;
     if (step>180)   step=180;
-    
+
     Data->step = step;
-    
+
     Data->poly = malloc(4 * sizeof(gpc_polygon***));
     if (Data->poly==NULL)
     {
@@ -149,7 +149,7 @@ void PolyDataCreate(PolyData *Data, int step)
                 }
                 Data->poly[i][j][k]->num_contours = 0;
                 Data->poly[i][j][k]->contour = NULL;
-                Data->poly[i][j][k]->hole = NULL;                
+                Data->poly[i][j][k]->hole = NULL;
             }
         }
     }
@@ -185,9 +185,9 @@ void ReClipping(PolyData *DataIn, PolyData *DataOut)
     int i;
     int level, x, y;
     int ratio;
-    
+
     ratio = DataIn->step / DataOut->step;
-    
+
     for (level=0; level<4; level++)
     {
         //printf("Level: %d\n", level);
@@ -197,17 +197,17 @@ void ReClipping(PolyData *DataIn, PolyData *DataOut)
             for (y=0; y<(180/DataOut->step); y++)
             {
                 //printf("Level, x, y: %d, %d, %d\n", level, x, y);
-                CreateClip(&clip, (x*DataOut->step) / GSHHS_SCL, (-90+y*DataOut->step) / GSHHS_SCL,
-                            ((x+1)*DataOut->step) / GSHHS_SCL, (-90+(y+1)*DataOut->step) / GSHHS_SCL);
+                CreateClip(&clip, (x*DataOut->step) / GSHHG_SCL, (-90+y*DataOut->step) / GSHHG_SCL,
+                            ((x+1)*DataOut->step) / GSHHG_SCL, (-90+(y+1)*DataOut->step) / GSHHG_SCL);
                 gpc_polygon_clip(GPC_INT, DataIn->poly[level][(int)floor(x/ratio)][(int)floor(y/ratio)], &clip, &result);
-                                
+
                 //printf("result1.num_contours: %d\n", result.num_contours);
                 //printf("DataOut->poly[level][x][y]->num_contours = %d\n", DataOut->poly[level][x][y]->num_contours);
                 for(i=0; i<result.num_contours; i++)
                 {
                     gpc_add_contour(DataOut->poly[level][x][y], &result.contour[i], 0);
                 }
-                
+
                 gpc_free_polygon(&clip);
                 gpc_free_polygon(&result);
             }
@@ -218,7 +218,7 @@ void ReClipping(PolyData *DataIn, PolyData *DataOut)
 void *ReClippingM(void *p_data)
 {
     ThreadData *data = p_data;
-        
+
     gpc_polygon clip;
     gpc_polygon result;
 
@@ -226,11 +226,11 @@ void *ReClippingM(void *p_data)
     int level, x, y;
     int ratio;
     int poly;
-    
+
     printf("th: %d\n", data->th_num);
-    
+
     ratio = data->DataIn->step / data->DataOut->step;
-    
+
     for (level=0; level<4; level++)
     {
         //printf("Level: %d\n", level);
@@ -243,17 +243,17 @@ void *ReClippingM(void *p_data)
                 if (poly>=data->PolyStart && poly<data->PolyFinish)
                 {
                     //printf("th: %d \t Level, x, y: %d, %d, %d\n", data->th_num,level, x, y);
-                    CreateClip(&clip, (x*data->DataOut->step) / GSHHS_SCL, (-90+y*data->DataOut->step) / GSHHS_SCL,
-                                ((x+1)*data->DataOut->step) / GSHHS_SCL, (-90+(y+1)*data->DataOut->step) / GSHHS_SCL);
+                    CreateClip(&clip, (x*data->DataOut->step) / GSHHG_SCL, (-90+y*data->DataOut->step) / GSHHG_SCL,
+                                ((x+1)*data->DataOut->step) / GSHHG_SCL, (-90+(y+1)*data->DataOut->step) / GSHHG_SCL);
                     gpc_polygon_clip(GPC_INT, data->DataIn->poly[level][(int)floor(x/ratio)][(int)floor(y/ratio)], &clip, &result);
-                                    
+
                     //printf("result1.num_contours: %d\n", result.num_contours);
                     //printf("DataOut->poly[level][x][y]->num_contours = %d\n", DataOut->poly[level][x][y]->num_contours);
                     for(i=0; i<result.num_contours; i++)
                     {
                         gpc_add_contour(data->DataOut->poly[level][x][y], &result.contour[i], 0);
                     }
-                    
+
                     gpc_free_polygon(&clip);
                     gpc_free_polygon(&result);
                 }
@@ -273,22 +273,28 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons)
     int     k, max_east = 270000000, n_read, flip;
     int     version;
     int     i = 0;
-    
+
     int     m;  /* Variable magnitude for area scale */
     double  scale = 10.0;
-    
+
     /*Polygone *tableau;*/
     gshhs_vertex_list *temp_polygons;
 
-    struct POINT p;
-    struct GSHHS h;
+    struct GSHHG_POINT p;
+    struct GSHHG_HEADER h;
 
-    n_read = fread ((void *)&h, (size_t)sizeof (struct GSHHS), (size_t)1, gshhs_file);
+    n_read = fread ((void *)&h, (size_t)sizeof (struct GSHHG_HEADER), (size_t)1, gshhs_file);
     version = (h.flag >> 8) & 255;
-    flip = (version != GSHHS_DATA_RELEASE);    /* Take as sign that byte-swabbing is needed */
+
+//The followig code is actually copied from the older gshhs SW version.
+#define GSHHG_DATA_RELEASE 9
+#define swabi4(i4) (((i4) >> 24) + (((i4) >> 8) & 65280) + (((i4) & 65280) << 8) + (((i4) & 255) << 24))      
+
+    flip = (version != GSHHG_DATA_RELEASE);    //Take as sign that byte-swabbing is needed
 
     while (n_read == 1)
     {
+
         if (flip)
         {
             h.id =          swabi4 ((unsigned int)h.id);
@@ -340,7 +346,7 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons)
 
         m = h.flag >> 26;
         scale = pow (10.0, (double)m);      /* Area scale */
-        
+
         polygons->contour[h.id].nb_point    = h.n;
         polygons->contour[h.id].level       = h.flag & 255;         /* level is 1-4 */
         polygons->contour[h.id].version     = (h.flag >> 8) & 255;  /* version is 1-255 */
@@ -380,76 +386,77 @@ void read_gshhs(FILE *gshhs_file, gshhs_polygons *polygons)
 
         for (k = 0; k < h.n; k++)
         {
-            if (fread ((void *)&p, (size_t)sizeof(struct POINT), (size_t)1, gshhs_file) != 1)
+            if (fread ((void *)&p, (size_t)sizeof(struct GSHHG_POINT), (size_t)1, gshhs_file) != 1)
             {
                 fprintf (stderr, "gshhs:  Error reading file\n");
                 exit (EXIT_FAILURE);
             }
+
             if (flip)
             {
                 p.x = swabi4 ((unsigned int)p.x);
                 p.y = swabi4 ((unsigned int)p.y);
             }
-            
+
             if (((polygons->contour[h.id].greenwich & 1) && p.x > max_east) || (h.west > 180000000))
             {
                 p.x -= 360000000;
-                
+
             }
-            
+
             polygons->contour[h.id].vertex[k].x = p.x;
             polygons->contour[h.id].vertex[k].y = p.y;
             if (DEBUG)
             {
-                lon = polygons->contour[h.id].vertex[k].x * GSHHS_SCL;
-                lat = polygons->contour[h.id].vertex[k].y * GSHHS_SCL;
+                lon = polygons->contour[h.id].vertex[k].x * GSHHG_SCL;
+                lat = polygons->contour[h.id].vertex[k].y * GSHHG_SCL;
                 printf ("lon(%2lu)=%10d ,%10.6f , lat(%2lu)=%10d ,%10.6f\n", (long unsigned int)sizeof(p.x), polygons->contour[h.id].vertex[k].x, lon,
                                                                              (long unsigned int)sizeof(p.y), polygons->contour[h.id].vertex[k].y, lat);
             }
-            
+
             if (h.south == -90000000 && k == (h.n - 4) ) {
                 k++;
                 polygons->contour[h.id].vertex[k].x = -180000000;
                 polygons->contour[h.id].vertex[k].y = -90000000;
-                
+
                 if (DEBUG)
                 {
-                    lon = polygons->contour[h.id].vertex[k].x * GSHHS_SCL;
-                    lat = polygons->contour[h.id].vertex[k].y * GSHHS_SCL;
+                    lon = polygons->contour[h.id].vertex[k].x * GSHHG_SCL;
+                    lat = polygons->contour[h.id].vertex[k].y * GSHHG_SCL;
                     printf ("lon(%2lu)=%10d ,%10.6f , lat(%2lu)=%10d ,%10.6f\n", (long unsigned int)sizeof(p.x), polygons->contour[h.id].vertex[k].x, lon,
                                                                                  (long unsigned int)sizeof(p.y), polygons->contour[h.id].vertex[k].y, lat);
                 }
-                
+
                 k++;
                 polygons->contour[h.id].vertex[k].x = 180000000;
                 polygons->contour[h.id].vertex[k].y = -90000000;
-                
+
                 if (DEBUG)
                 {
-                    lon = polygons->contour[h.id].vertex[k].x * GSHHS_SCL;
-                    lat = polygons->contour[h.id].vertex[k].y * GSHHS_SCL;
+                    lon = polygons->contour[h.id].vertex[k].x * GSHHG_SCL;
+                    lat = polygons->contour[h.id].vertex[k].y * GSHHG_SCL;
                     printf ("lon(%2lu)=%10d ,%10.6f , lat(%2lu)=%10d ,%10.6f\n", (long unsigned int)sizeof(p.x), polygons->contour[h.id].vertex[k].x, lon,
                                                                                  (long unsigned int)sizeof(p.y), polygons->contour[h.id].vertex[k].y, lat);
                 }
-                
+
                 k++;
                 polygons->contour[h.id].vertex[k].x = polygons->contour[h.id].vertex[0].x;
                 polygons->contour[h.id].vertex[k].y = polygons->contour[h.id].vertex[0].y;
-                
+
                 if (DEBUG)
                 {
-                    lon = polygons->contour[h.id].vertex[k].x * GSHHS_SCL;
-                    lat = polygons->contour[h.id].vertex[k].y * GSHHS_SCL;
+                    lon = polygons->contour[h.id].vertex[k].x * GSHHG_SCL;
+                    lat = polygons->contour[h.id].vertex[k].y * GSHHG_SCL;
                     printf ("lon(%2lu)=%10d ,%10.6f , lat(%2lu)=%10d ,%10.6f\n", (long unsigned int)sizeof(p.x), polygons->contour[h.id].vertex[k].x, lon,
                                                                                  (long unsigned int)sizeof(p.y), polygons->contour[h.id].vertex[k].y, lat);
                 }
             }
         }
-        
+
         if (polygons->contour[h.id].greenwich & 3) max_east = 180000000;    /* Only Eurasiafrica needs 270 */
-        
-        n_read = fread((void *)&h, (size_t)sizeof (struct GSHHS), (size_t)1, gshhs_file);
-        
+
+        n_read = fread((void *)&h, (size_t)sizeof (struct GSHHG_HEADER), (size_t)1, gshhs_file);
+
     }
     polygons->nb_poly = h.id;
 
@@ -996,8 +1003,8 @@ void DrawPolygonFilled( gdImagePtr Image, gpc_polygon *p,
 
         for (v= 0; v < p->contour[c].num_vertices; v++)
         {
-            poly_pt[v].x = (int)round(X_Origine + MercatorLongitudeSimple(p->contour[c].vertex[v].x * GSHHS_SCL) *r);
-            poly_pt[v].y = (int)round(Y_Origine - MercatorLatitudeSimple(p->contour[c].vertex[v].y * GSHHS_SCL)  *r);
+            poly_pt[v].x = (int)round(X_Origine + MercatorLongitudeSimple(p->contour[c].vertex[v].x * GSHHG_SCL) *r);
+            poly_pt[v].y = (int)round(Y_Origine - MercatorLatitudeSimple(p->contour[c].vertex[v].y * GSHHG_SCL)  *r);
         }
         gdImageFilledPolygon(Image, poly_pt, p->contour[c].num_vertices , Fill_Color);
 
@@ -1022,10 +1029,10 @@ void    DrawPolygonContour( gdImagePtr Image, gpc_polygon *p,
 
     r = 180.0*Zoom/M_PI;
 
-    long_min=(double)x/GSHHS_SCL;
-    lat_min=(double)y/GSHHS_SCL;
-    long_max=((double)x+(double)pas_x)/GSHHS_SCL;
-    lat_max=((double)y+(double)pas_y)/GSHHS_SCL;
+    long_min=(double)x/GSHHG_SCL;
+    lat_min=(double)y/GSHHG_SCL;
+    long_max=((double)x+(double)pas_x)/GSHHG_SCL;
+    lat_max=((double)y+(double)pas_y)/GSHHG_SCL;
 
     for (c= 0; c < p->num_contours; c++)
     {
@@ -1039,8 +1046,8 @@ void    DrawPolygonContour( gdImagePtr Image, gpc_polygon *p,
             // Elimination des traits verticaux et horizontaux
             if ((((x1==x2) && ((x1==long_min) || (x1==long_max))) || ((y1==y2) && ((y1==lat_min) || (y1==lat_max))))==0)
             {
-                gdImageLine(Image,  (int)round(X_Origine + MercatorLongitudeSimple(x1 * GSHHS_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y1 * GSHHS_SCL)  *r),
-                                    (int)round(X_Origine + MercatorLongitudeSimple(x2 * GSHHS_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y2 * GSHHS_SCL)  *r),
+                gdImageLine(Image,  (int)round(X_Origine + MercatorLongitudeSimple(x1 * GSHHG_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y1 * GSHHG_SCL)  *r),
+                                    (int)round(X_Origine + MercatorLongitudeSimple(x2 * GSHHG_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y2 * GSHHG_SCL)  *r),
                                     Contour_Color);
 
             }
@@ -1053,8 +1060,8 @@ void    DrawPolygonContour( gdImagePtr Image, gpc_polygon *p,
 
         if ((((x1==x2) && ((x1==long_min) || (x1==long_max))) || ((y1==y2) && ((y1==lat_min) || (y1==lat_max))))==0)
         {
-            gdImageLine(Image,  (int)round(X_Origine + MercatorLongitudeSimple(x1 * GSHHS_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y1 * GSHHS_SCL)  *r),
-                                (int)round(X_Origine + MercatorLongitudeSimple(x2 * GSHHS_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y2 * GSHHS_SCL)  *r),
+            gdImageLine(Image,  (int)round(X_Origine + MercatorLongitudeSimple(x1 * GSHHG_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y1 * GSHHG_SCL)  *r),
+                                (int)round(X_Origine + MercatorLongitudeSimple(x2 * GSHHG_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y2 * GSHHG_SCL)  *r),
                                 Contour_Color);
 
         }
@@ -1149,8 +1156,8 @@ void    DrawLine(   gdImagePtr Image, gshhs_contour *p,
             y2=p->line[c].y2;
             //printf("x1: %lf - y1: %lf - x2: %lf - y2: %lf\n", x1, y1, x2, y2);
 
-            gdImageLine(Image,  (int)round(X_Origine + MercatorLongitudeSimple(x1 * GSHHS_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y1 * GSHHS_SCL)  *r),
-                                (int)round(X_Origine + MercatorLongitudeSimple(x2 * GSHHS_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y2 * GSHHS_SCL)  *r),
+            gdImageLine(Image,  (int)round(X_Origine + MercatorLongitudeSimple(x1 * GSHHG_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y1 * GSHHG_SCL)  *r),
+                                (int)round(X_Origine + MercatorLongitudeSimple(x2 * GSHHG_SCL) *r), (int)round(Y_Origine - MercatorLatitudeSimple(y2 * GSHHG_SCL)  *r),
                                 Contour_Color);
 
         }
@@ -1239,12 +1246,12 @@ void PolygonToGML(gpc_polygon *p, FILE *gmlfile, int translate)
 
         for (v= 0; v < p->contour[c].num_vertices; v++)
         {
-            x=p->contour[c].vertex[v].x * GSHHS_SCL + translate;
-            y=p->contour[c].vertex[v].y * GSHHS_SCL;
+            x=p->contour[c].vertex[v].x * GSHHG_SCL + translate;
+            y=p->contour[c].vertex[v].y * GSHHG_SCL;
             fprintf(gmlfile, "%lf,%lf\n", x, y);
         }
-        x=p->contour[c].vertex[0].x * GSHHS_SCL + translate;
-        y=p->contour[c].vertex[0].y * GSHHS_SCL;
+        x=p->contour[c].vertex[0].x * GSHHG_SCL + translate;
+        y=p->contour[c].vertex[0].y * GSHHG_SCL;
         fprintf(gmlfile, "%lf,%lf\n", x, y);
 
 
@@ -1267,6 +1274,57 @@ void PolygonToGML(gpc_polygon *p, FILE *gmlfile, int translate)
 
 }
 
+typedef struct
+{
+    double x;
+    double y;
+    double z;
+} Point1;
+
+typedef struct
+{
+    double a;
+    double b;
+} Coef1;
+
+inline double cubicInterpolate (double p[4], double x) {
+    return p[1] + (-0.5*p[0] + 0.5*p[2])*x + (p[0] - 2.5*p[1] + 2.0*p[2] - 0.5*p[3])*x*x + (-0.5*p[0] + 1.5*p[1] - 1.5*p[2] + 0.5*p[3])*x*x*x;
+}
+
+void bicubicInterpolate (double p[4][4], Point1 *P) {
+    double arr[4];
+
+    arr[0] = cubicInterpolate(p[0], P->y);
+    arr[1] = cubicInterpolate(p[1], P->y);
+    arr[2] = cubicInterpolate(p[2], P->y);
+    arr[3] = cubicInterpolate(p[3], P->y);
+    P->z = cubicInterpolate(arr, P->x);
+}
+
+inline void Bilin(Point1 A, Point1 B, Point1 C, Point1 D, Point1 *P) {
+
+    Coef1 AB, CD;
+    Point1 E, F;
+    Coef1 EF;
+
+    AB.a = (A.z-B.z)/(A.x-B.x);
+    AB.b = A.z-AB.a*A.x;
+    CD.a = (C.z-D.z)/(C.x-D.x);
+    CD.b = C.z-CD.a*C.x;
+
+    E.x = P->x;
+    E.y = A.y;
+    E.z = AB.a*E.x+AB.b;
+    F.x = P->x;
+    F.y = C.y;
+    F.z = CD.a*F.x+CD.b;
+
+    EF.a = (E.z-F.z)/(E.y-F.y);
+    EF.b = E.z-EF.a*E.y;
+
+    P->z = EF.a*P->y+EF.b;
+}
+
 void DrawEtopo     ( gdImagePtr Image,
                     FILE *EtopoFile,
                     int flag_memory,
@@ -1276,58 +1334,6 @@ void DrawEtopo     ( gdImagePtr Image,
                     int Land_Color, int Water_Color,
                     int FlagAlpha)
 {
-    typedef struct
-     {
-        double x;
-        double y;
-        double z;
-    } Point;
-
-    double cubicInterpolate (double p[4], double x) {
-        return p[1] + (-0.5*p[0] + 0.5*p[2])*x + (p[0] - 2.5*p[1] + 2.0*p[2] - 0.5*p[3])*x*x + (-0.5*p[0] + 1.5*p[1] - 1.5*p[2] + 0.5*p[3])*x*x*x;
-    }
-
-    void bicubicInterpolate (double p[4][4], Point *P) {
-	   double arr[4];
-
-        arr[0] = cubicInterpolate(p[0], P->y);
-        arr[1] = cubicInterpolate(p[1], P->y);
-        arr[2] = cubicInterpolate(p[2], P->y);
-        arr[3] = cubicInterpolate(p[3], P->y);
-        P->z=cubicInterpolate(arr, P->x);
-    }
-
-
-    void Bilin(Point A, Point B, Point C, Point D, Point *P) {
-
-        typedef struct
-        {
-            double a;
-            double b;
-        } Coef;
-
-
-        Coef AB, CD;
-        Point E, F;
-        Coef EF;
-
-        AB.a = (A.z-B.z)/(A.x-B.x);
-        AB.b = A.z-AB.a*A.x;
-        CD.a = (C.z-D.z)/(C.x-D.x);
-        CD.b = C.z-CD.a*C.x;
-
-        E.x = P->x;
-        E.y = A.y;
-        E.z = AB.a*E.x+AB.b;
-        F.x = P->x;
-        F.y = C.y;
-        F.z = CD.a*F.x+CD.b;
-
-        EF.a = (E.z-F.z)/(E.y-F.y);
-        EF.b = E.z-EF.a*E.y;
-
-        P->z = EF.a*P->y+EF.b;
-    };
 
 
     ETOPO_Header Header;
@@ -1342,7 +1348,7 @@ void DrawEtopo     ( gdImagePtr Image,
     double lon_p, lat_p;
     double lon_s, lat_s;
     double pt[4][4];
-    Point P;
+    Point1 P;
     int u, v;
     int GetColor;
 
@@ -1776,7 +1782,7 @@ void DrawEtopo     ( gdImagePtr Image,
 
                                     gdImageSetPixel(Image, lon+bord, lat+bord, IceColor[TabColor]);
                                 }
-                                
+
                             }
                         }
                         else

@@ -52,7 +52,7 @@
 
 
 
-#include "gshhs.h"
+#include "gshhg.h"
 #include "gpc.h"
 #include "PolyUtil.h"
 

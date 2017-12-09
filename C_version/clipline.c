@@ -35,7 +35,7 @@
 #include <math.h>
 
 
-#include "gshhs.h"
+#include "gshhg.h"
 #include "gpc.h"
 #include "PolyUtil.h"
 
@@ -140,14 +140,14 @@ int main (int argc, char **argv)
             // if (polygons->contour[n].vertex[k].x <0) printf("negatif: \n");
             //printf("x1= %d\n", polygons->contour[n].vertex[k].x);
             if (DEBUG) printf("\n");
-            x1min=floor(polygons->contour[n].vertex[k].x * GSHHS_SCL);
-            x1max=ceil(polygons->contour[n].vertex[k].x * GSHHS_SCL);
-            x2min=floor(polygons->contour[n].vertex[k+1].x * GSHHS_SCL);
-            x2max=ceil(polygons->contour[n].vertex[k+1].x * GSHHS_SCL);
-            y1min=floor(polygons->contour[n].vertex[k].y * GSHHS_SCL + 90);
-            y1max=ceil(polygons->contour[n].vertex[k].y * GSHHS_SCL + 90);
-            y2min=floor(polygons->contour[n].vertex[k+1].y * GSHHS_SCL + 90);
-            y2max=ceil(polygons->contour[n].vertex[k+1].y * GSHHS_SCL + 90);
+            x1min=floor(polygons->contour[n].vertex[k].x * GSHHG_SCL);
+            x1max=ceil(polygons->contour[n].vertex[k].x * GSHHG_SCL);
+            x2min=floor(polygons->contour[n].vertex[k+1].x * GSHHG_SCL);
+            x2max=ceil(polygons->contour[n].vertex[k+1].x * GSHHG_SCL);
+            y1min=floor(polygons->contour[n].vertex[k].y * GSHHG_SCL + 90);
+            y1max=ceil(polygons->contour[n].vertex[k].y * GSHHG_SCL + 90);
+            y2min=floor(polygons->contour[n].vertex[k+1].y * GSHHG_SCL + 90);
+            y2max=ceil(polygons->contour[n].vertex[k+1].y * GSHHG_SCL + 90);
 
             if (x1min<x2min) xmin=x1min; else xmin=x2min;
             if (x1max<x2max) xmax=x2max; else xmax=x1max;
@@ -165,10 +165,10 @@ int main (int argc, char **argv)
                     ClipRect.p2.x = i+1;
                     ClipRect.p2.y = (j-90)+1;
 
-                    InitialLine.p1.x = polygons->contour[n].vertex[k].x* GSHHS_SCL;
-                    InitialLine.p1.y = polygons->contour[n].vertex[k].y* GSHHS_SCL;
-                    InitialLine.p2.x = polygons->contour[n].vertex[k+1].x* GSHHS_SCL;
-                    InitialLine.p2.y = polygons->contour[n].vertex[k+1].y* GSHHS_SCL;
+                    InitialLine.p1.x = polygons->contour[n].vertex[k].x* GSHHG_SCL;
+                    InitialLine.p1.y = polygons->contour[n].vertex[k].y* GSHHG_SCL;
+                    InitialLine.p2.x = polygons->contour[n].vertex[k+1].x* GSHHG_SCL;
+                    InitialLine.p2.y = polygons->contour[n].vertex[k+1].y* GSHHG_SCL;
                     if (DEBUG) printf("Initial X1: %lf\tY1: %lf\tX2: %lf\tY2: %lf\n", InitialLine.p1.x, InitialLine.p1.y, InitialLine.p2.x, InitialLine.p2.y);
 
                     FinalLine.p1.x = 0;
@@ -210,10 +210,10 @@ int main (int argc, char **argv)
                                 }
                             }
 
-                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].x1 = (FinalLine.p1.x + 360) / GSHHS_SCL;
-                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].y1 = FinalLine.p1.y / GSHHS_SCL;
-                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].x2 = (FinalLine.p2.x + 360) / GSHHS_SCL;
-                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].y2 = FinalLine.p2.y / GSHHS_SCL;
+                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].x1 = (FinalLine.p1.x + 360) / GSHHG_SCL;
+                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].y1 = FinalLine.p1.y / GSHHG_SCL;
+                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].x2 = (FinalLine.p2.x + 360) / GSHHG_SCL;
+                            contour[i+360][j]->line[contour[i+360][j]->nb_line - 1].y2 = FinalLine.p2.y / GSHHG_SCL;
                         }
 
                         if (i>=0 && i<360)
@@ -245,10 +245,10 @@ int main (int argc, char **argv)
                                 }
                             }
 
-                            contour[i][j]->line[contour[i][j]->nb_line - 1].x1 = FinalLine.p1.x / GSHHS_SCL;
-                            contour[i][j]->line[contour[i][j]->nb_line - 1].y1 = FinalLine.p1.y / GSHHS_SCL;
-                            contour[i][j]->line[contour[i][j]->nb_line - 1].x2 = FinalLine.p2.x / GSHHS_SCL;
-                            contour[i][j]->line[contour[i][j]->nb_line - 1].y2 = FinalLine.p2.y / GSHHS_SCL;
+                            contour[i][j]->line[contour[i][j]->nb_line - 1].x1 = FinalLine.p1.x / GSHHG_SCL;
+                            contour[i][j]->line[contour[i][j]->nb_line - 1].y1 = FinalLine.p1.y / GSHHG_SCL;
+                            contour[i][j]->line[contour[i][j]->nb_line - 1].x2 = FinalLine.p2.x / GSHHG_SCL;
+                            contour[i][j]->line[contour[i][j]->nb_line - 1].y2 = FinalLine.p2.y / GSHHG_SCL;
                         }
 
                         if (i>=360)
@@ -280,10 +280,10 @@ int main (int argc, char **argv)
                                 }
                             }
 
-                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].x1 = (FinalLine.p1.x - 360) / GSHHS_SCL;
-                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].y1 = FinalLine.p1.y / GSHHS_SCL;
-                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].x2 = (FinalLine.p2.x - 360) / GSHHS_SCL;
-                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].y2 = FinalLine.p2.y / GSHHS_SCL;
+                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].x1 = (FinalLine.p1.x - 360) / GSHHG_SCL;
+                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].y1 = FinalLine.p1.y / GSHHG_SCL;
+                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].x2 = (FinalLine.p2.x - 360) / GSHHG_SCL;
+                            contour[i-360][j]->line[contour[i-360][j]->nb_line - 1].y2 = FinalLine.p2.y / GSHHG_SCL;
                         }
                     }
                 }
@@ -301,7 +301,7 @@ int main (int argc, char **argv)
     }
     printf("Write: %s\n", LineDataFileName);
 
-    header_out.version=  300;
+    header_out.version=  220;
     header_out.pasx=     1;
     header_out.pasy=     1;
     header_out.xmin=     0;

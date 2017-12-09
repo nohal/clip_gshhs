@@ -1081,22 +1081,18 @@ void gpc_add_contour(gpc_polygon *p, gpc_vertex_list *new_contour, int hole)
 {
   int             *extended_hole, c, v;
   gpc_vertex_list *extended_contour;
-
   /* Create an extended hole array */
   MALLOC(extended_hole, (p->num_contours + 1)
          * sizeof(int), "contour hole addition", int);
-
   /* Create an extended contour array */
   MALLOC(extended_contour, (p->num_contours + 1)
          * sizeof(gpc_vertex_list), "contour addition", gpc_vertex_list);
-
   /* Copy the old contour and hole data into the extended arrays */
   for (c= 0; c < p->num_contours; c++)
   {
     extended_hole[c]= p->hole[c];
     extended_contour[c]= p->contour[c];
   }
-
   /* Copy the new contour and hole onto the end of the extended arrays */
   c= p->num_contours;
   extended_hole[c]= hole;
@@ -1105,11 +1101,9 @@ void gpc_add_contour(gpc_polygon *p, gpc_vertex_list *new_contour, int hole)
          * sizeof(gpc_vertex), "contour addition", gpc_vertex);
   for (v= 0; v < new_contour->num_vertices; v++)
     extended_contour[c].vertex[v]= new_contour->vertex[v];
-
   /* Dispose of the old contour */
   FREE(p->contour);
   FREE(p->hole);
-    
   /* Update the polygon information */
   p->num_contours++;
   p->hole= extended_hole;

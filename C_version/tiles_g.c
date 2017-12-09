@@ -36,7 +36,7 @@
 #include <getopt.h>
 
 #include "gpc.h"
-#include "gshhs.h"
+#include "gshhg.h"
 #include "libtiles.h"
 
 #define TILEMAXDIM 32768
